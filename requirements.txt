@@ -1,0 +1,6 @@
+requests
+pypac
+urllib3
+lxml
+argparse
+ipwhois
