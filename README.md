@@ -24,10 +24,12 @@ usage: esirp.py [-h] [-i FILENAME | -d DOMAIN] [-w WORDLIST] [-o OUTPUT] [-p PRO
 
 #python3 esirp.py -d testfire.net -w subdomains-100.txt
 
-ftp.testfire.net,200 OK,Altoro Mutual,65.61.137.117,33070,RMH-14 - Rackspace Hosting, US
+<b>ftp.testfire.net</b>,200 OK,Altoro Mutual,65.61.137.117,33070,RMH-14 - Rackspace Hosting, US
 
-localhost.testfire.net,200 OK,Altoro Mutual,65.61.137.117,33070,RMH-14 - Rackspace Hosting, US
+<b>localhost.testfire.net</b>,200 OK,Altoro Mutual,65.61.137.117,33070,RMH-14 - Rackspace Hosting, US
 
-demo.testfire.net,200 OK,Altoro Mutual,65.61.137.117,33070,RMH-14 - Rackspace Hosting, US
+<b>demo.testfire.net</b>,200 OK,Altoro Mutual,65.61.137.117,33070,RMH-14 - Rackspace Hosting, US
 
-www.testfire.net, 200 OK,Altoro Mutual,65.61.137.117,33070,RMH-14 - Rackspace Hosting, US
+<b>www.testfire.net</b> OK,Altoro Mutual,65.61.137.117,33070,RMH-14 - Rackspace Hosting, US
+
+#
