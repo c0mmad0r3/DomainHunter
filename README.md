@@ -1,8 +1,10 @@
-#EsiRP
+# EsiRP
 
 EsiRP is a script designed to provide the HTTP response, Title, IP address, ASN Number and location for a domain and subdomains
 
+
 usage: esirp.py [-h] [-i FILENAME | -d DOMAIN] [-w WORDLIST] [-o OUTPUT] [-p PROXY] [-v]
+
 
 -h, --help                          show this help message and exit
 
@@ -21,7 +23,7 @@ usage: esirp.py [-h] [-i FILENAME | -d DOMAIN] [-w WORDLIST] [-o OUTPUT] [-p PRO
 
 Example Output:
 
-# python3 esirp.py -d testfire.net -w subdomains-100.txt
+#python3 esirp.py -d testfire.net -w subdomains-100.txt
 
 ftp.testfire.net,200 OK,Altoro Mutual,65.61.137.117,33070,RMH-14 - Rackspace Hosting, US
 
