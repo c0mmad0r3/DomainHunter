@@ -20,8 +20,8 @@ usage: esirp.py [-h] [-i FILENAME | -d DOMAIN] [-w WORDLIST] [-o OUTPUT] [-p PRO
 # Example Output:
 
 #python3 esirp.py -d testfire.net -w subdomains-100.txt
-<p>ftp.testfire.net,200 OK,Altoro Mutual,65.61.137.117,33070,RMH-14 - Rackspace Hosting, US
-localhost.testfire.net,200 OK,Altoro Mutual,65.61.137.117,33070,RMH-14 - Rackspace Hosting, US
-demo.testfire.net,200 OK,Altoro Mutual,65.61.137.117,33070,RMH-14 - Rackspace Hosting, US
-www.testfire.net OK,Altoro Mutual,65.61.137.117,33070,RMH-14 - Rackspace Hosting, US</p>
+<p>ftp.testfire.net,200 OK,Altoro Mutual,65.61.137.117,33070,RMH-14 - Rackspace Hosting, US</p>
+<p>localhost.testfire.net,200 OK,Altoro Mutual,65.61.137.117,33070,RMH-14 - Rackspace Hosting, US</p>
+<p>demo.testfire.net,200 OK,Altoro Mutual,65.61.137.117,33070,RMH-14 - Rackspace Hosting, US</p>
+<p>www[.]testfire.net,200 OK,Altoro Mutual,65.61.137.117,33070,RMH-14 - Rackspace Hosting, US</p>
 #
