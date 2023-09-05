@@ -1,15 +1,17 @@
 #!/usr/bin/python
 
 import warnings
-import sys, getopt, requests, socket
+import sys
+import getopt
+import requests
+import socket
 from pypac import PACSession, get_pac
 from requests.auth import HTTPProxyAuth
+import logging
 import urllib3
 import time
-import logging
-import requests
 import lxml
-import Queue
+import queue
 import argparse
 import codecs
 import socket
@@ -19,29 +21,13 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from requests.packages.urllib3.util.ssl_ import create_urllib3_context
 from lxml.html import fromstring
-
-#Needed for python2
-from urlparse import urlparse
-
-#from urllib.parse import urlparse
+from urllib.parse import urlparse
 from ipwhois import IPWhois
-
-#Python3 reload
-#from importlib import reload
-
+from importlib import reload
 
 #logging.basicConfig(level=logging.DEBUG)
 
-#Used for Python2
-reload(sys)
-sys.setdefaultencoding('utf-8')
-
-q = Queue.Queue()
-
-if sys.stdout.encoding != 'UTF-8':
-    sys.stdout = codecs.getwriter('utf-8')(sys.stdout, 'strict')
-if sys.stderr.encoding != 'UTF-8':
-    sys.stderr = codecs.getwriter('utf-8')(sys.stderr, 'strict')
+q = queue.Queue()
 
 urllib3.disable_warnings()
 parser = argparse.ArgumentParser(prog='esirp.py', description='EsiRP is a script designed to provide the HTTP response, Title, IP address, ASN Number and location for a domain and subdomains')
@@ -53,7 +39,6 @@ parser.add_argument("-o", "--ofile", dest="output", help="Provide the filename t
 parser.add_argument("-p", "--proxy", dest="proxy", help="Send all traffic through a proxy")
 parser.add_argument("-v", "--verbose", dest="verbose", help="Show logging", action="store_true")
 args=parser.parse_args()
-
 
 def subdomain(filename,wordlist):
     with codecs.open(args.filename, encoding='utf-8') as f:
@@ -89,12 +74,12 @@ def subdomain(filename,wordlist):
                                             ASNNumber=results['asn']
                                             ASNDesc=results['asn_description']
                                             if ASNDesc is not None:
-                                                print (sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                                print(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                             else:
-                                                print (sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                                print(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                                             
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                            print (sub+",was redirected to,"+r.url+","+title+","+whoislkup)
+                                            print(sub+",was redirected to,"+r.url+","+title+","+whoislkup)
                                 else:
                                     whoislkup=(socket.gethostbyname(newdom))
                                     with warnings.catch_warnings():
@@ -105,11 +90,11 @@ def subdomain(filename,wordlist):
                                             ASNNumber=results['asn']
                                             ASNDesc=results['asn_description']
                                             if ASNDesc is not None:
-                                                print (sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                                print(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                             else:
-                                                print (sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                                print(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                            print (sub+",was redirected to,"+r.url+","+title+","+whoislkup)
+                                            print(sub+",was redirected to,"+r.url+","+title+","+whoislkup)
 							
                             else:
                                 if (":80" in newdom) or (":443" in newdom):
@@ -123,11 +108,11 @@ def subdomain(filename,wordlist):
                                             ASNNumber=results['asn']
                                             ASNDesc=results['asn_description']
                                             if ASNDesc is not None:
-                                                print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                                print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                             else:
-                                                print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                                print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                            print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                            print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
 
                         else:
                             tree = fromstring(r.content)
@@ -149,11 +134,11 @@ def subdomain(filename,wordlist):
                                                 ASNNumber=results['asn']
                                                 ASNDesc=results['asn_description']
                                                 if ASNDesc is not None:
-                                                    print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                                    print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                                 else:
-                                                    print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
+                                                    print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
                                             except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                                print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
+                                                print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
                                     else:
                                         whoislkup=(socket.gethostbyname(newdom))
                                         with warnings.catch_warnings():
@@ -164,11 +149,11 @@ def subdomain(filename,wordlist):
                                                 ASNNumber=results['asn']
                                                 ASNDesc=results['asn_description']
                                                 if ASNDesc is not None:
-                                                    print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                                    print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                                 else:
-                                                    print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
+                                                    print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
                                             except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                                print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
+                                                print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
                             else:
                                 if (":80" in newdom) or (":443" in newdom):
                                     redirurl,redirport=newdom.split(':')
@@ -181,11 +166,11 @@ def subdomain(filename,wordlist):
                                             ASNNumber=results['asn']
                                             ASNDesc=results['asn_description']
                                             if ASNDesc is not None:
-                                                print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                                print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                             else:
-                                                print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                                print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                            print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                            print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
                                 else:
                                     whoislkup=(socket.gethostbyname(newdom))
                                     with warnings.catch_warnings():
@@ -196,11 +181,11 @@ def subdomain(filename,wordlist):
                                             ASNNumber=results['asn']
                                             ASNDesc=results['asn_description']
                                             if ASNDesc is not None:
-                                                print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                                print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                             else:
-                                                print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                                print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                            print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                            print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
                                 
                     except (lxml.etree.ParserError, requests.exceptions.ReadTimeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError, requests.exceptions.SSLError) as error :
                         pass
@@ -236,11 +221,11 @@ def domainfile(filename):
                                 ASNNumber=results['asn']
                                 ASNDesc=results['asn_description']
                                 if ASNDesc is not None:
-                                    print (url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                    print(url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                 else:
-                                    print (url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                    print(url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                             except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                print (url+",was redirected to,"+r.url+","+title+","+whoislkup)
+                                print(url+",was redirected to,"+r.url+","+title+","+whoislkup)
                     else:
                         whoislkup=(socket.gethostbyname(newdom))
                         with warnings.catch_warnings():
@@ -251,11 +236,11 @@ def domainfile(filename):
                                 ASNNumber=results['asn']
                                 ASNDesc=results['asn_description']
                                 if ASNDesc is not None:
-                                    print (url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                    print(url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                 else:
-                                    print (url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                    print(url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                             except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                print (url+",was redirected to,"+r.url+","+title+","+whoislkup)	
+                                print(url+",was redirected to,"+r.url+","+title+","+whoislkup)
                 else:
                     if (":80" in newdom) or (":443" in newdom):
                         redirurl,redirport=newdom.split(':')
@@ -268,11 +253,11 @@ def domainfile(filename):
                                 ASNNumber=results['asn']
                                 ASNDesc=results['asn_description']
                                 if ASNDesc is not None:
-                                    print (url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                    print(url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                 else:
-                                    print (url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                    print(url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                             except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                print (url+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                print(url+",was redirected to,"+r.url+","+" "+","+whoislkup)
                     else:
                         whoislkup=(socket.gethostbyname(newdom))
                         with warnings.catch_warnings():
@@ -283,11 +268,11 @@ def domainfile(filename):
                                 ASNNumber=results['asn']
                                 ASNDesc=results['asn_description']
                                 if ASNDesc is not None:
-                                    print (url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                    print(url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                 else:
-                                    print (url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                    print(url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                             except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                print (url+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                print(url+",was redirected to,"+r.url+","+" "+","+whoislkup)
             else:
                 tree = fromstring(r.content)
                 title=(tree.findtext('.//title'))
@@ -308,11 +293,11 @@ def domainfile(filename):
                                     ASNNumber=results['asn']
                                     ASNDesc=results['asn_description']
                                     if ASNDesc is not None:
-                                        print (url+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                        print(url+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-                                        print (url+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")                                   
+                                        print(url+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")                                 
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                    print (url+","+statcode+" "+reasoncode+","+title+","+whoislkup)
+                                    print(url+","+statcode+" "+reasoncode+","+title+","+whoislkup)
                         else:
                             whoislkup=(socket.gethostbyname(newdom))
                             with warnings.catch_warnings():
@@ -323,11 +308,11 @@ def domainfile(filename):
                                     ASNNumber=results['asn']
                                     ASNDesc=results['asn_description']
                                     if ASNDesc is not None:
-                                        print (url+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                        print(url+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-                                        print (url+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
+                                        print(url+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                    print (url+","+statcode+" "+reasoncode+","+title+","+whoislkup)				
+                                    print(url+","+statcode+" "+reasoncode+","+title+","+whoislkup)			
 
 
                 else:
@@ -342,11 +327,11 @@ def domainfile(filename):
                                 ASNNumber=results['asn']
                                 ASNDesc=results['asn_description']
                                 if ASNDesc is not None:
-                                    print (url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                    print(url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                 else:
-                                    print (url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                    print(url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                             except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                print (url+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                print(url+",was redirected to,"+r.url+","+" "+","+whoislkup)
                     else:
                         whoislkup=(socket.gethostbyname(newdom))
                         with warnings.catch_warnings():
@@ -357,11 +342,11 @@ def domainfile(filename):
                                 ASNNumber=results['asn']
                                 ASNDesc=results['asn_description']
                                 if ASNDesc is not None:
-                                    print (url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                    print(url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                 else:
-                                    print (url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                    print(url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                             except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                print (url+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                print(url+",was redirected to,"+r.url+","+" "+","+whoislkup)
 
         except (lxml.etree.ParserError, requests.exceptions.ReadTimeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError, requests.exceptions.SSLError) as error :
             pass
@@ -393,12 +378,12 @@ def singledomain(domain):
                             ASNNumber=results['asn']
                             ASNDesc=results['asn_description']
                             if ASNDesc is not None:
-                                print (domain+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                print(domain+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                             else:
-                                print (domain+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                print(domain+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                             
                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                            print (domain+",was redirected to,"+r.url+","+title+","+whoislkup)
+                            print(domain+",was redirected to,"+r.url+","+title+","+whoislkup)
                 else:
                     whoislkup=(socket.gethostbyname(newdom))
                     with warnings.catch_warnings():
@@ -409,12 +394,14 @@ def singledomain(domain):
                             ASNNumber=results['asn']
                             ASNDesc=results['asn_description']
                             if ASNDesc is not None:
-                                print (domain+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                print(domain+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                             else:
-                                print (domain+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                print(domain+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                            print (domain+",was redirected to,"+r.url+","+title+","+whoislkup)							
+                            print(domain+",was redirected to,"+r.url+","+title+","+whoislkup)						
             else:
+                if "comingsoon.markmonitor.com" in r.url:
+                    pass
                 if (":80" in newdom) or (":443" in newdom):
                     redirurl,redirport=newdom.split(':')
                     whoislkup=(socket.gethostbyname(redirurl))
@@ -426,11 +413,11 @@ def singledomain(domain):
                             ASNNumber=results['asn']
                             ASNDesc=results['asn_description']
                             if ASNDesc is not None:
-                                print (domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                             else:
-                                print (domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")                    
+                                print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")                   
                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                            print (domain+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                            print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup)
                 else:
                     whoislkup=(socket.gethostbyname(newdom))
                     with warnings.catch_warnings():
@@ -441,11 +428,11 @@ def singledomain(domain):
                             ASNNumber=results['asn']
                             ASNDesc=results['asn_description']
                             if ASNDesc is not None:
-                                print (domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                             else:
-                                print (domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")                    
+                                print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")                 
                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                            print (domain+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                            print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup)
         else:
             tree = fromstring(r.content)
             title=(tree.findtext('.//title'))
@@ -454,8 +441,6 @@ def singledomain(domain):
             if title is not None:
                 statcode=str(r.status_code)
                 reasoncode=str(r.reason)
-                redirdomain=urlparse(r.url)
-                newdom=str(redirdomain.netloc)
                 if ("40" not in statcode) and ("50" not in statcode):
                     if (":80" in newdom) or (":443" in newdom):
                         redirurl,redirport=newdom.split(':')
@@ -473,56 +458,59 @@ def singledomain(domain):
                                     print(domain+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None\n")
                             except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                 print(domain+","+statcode+" "+reasoncode+","+title+","+whoislkup+"\n")
-                else:
-                    whoislkup=(socket.gethostbyname(newdom))
-                    with warnings.catch_warnings():
-                        warnings.filterwarnings("ignore", category=UserWarning)
-                        try:
-                            obj = IPWhois(whoislkup)
-                            results = obj.lookup_whois()
-                            ASNNumber=results['asn']
-                            ASNDesc=results['asn_description']
-                            if ASNDesc is not None:
-                                print(domain+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
-                            else:
-                                print(domain+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None\n")
-                        except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                            print(domain+","+statcode+" "+reasoncode+","+title+","+whoislkup+"\n")				
+                    else:
+                        whoislkup=(socket.gethostbyname(newdom))
+                        with warnings.catch_warnings():
+                            warnings.filterwarnings("ignore", category=UserWarning)
+                            try:
+                                obj = IPWhois(whoislkup)
+                                results = obj.lookup_whois()
+                                ASNNumber=results['asn']
+                                ASNDesc=results['asn_description']
+                                if ASNDesc is not None:
+                                    print(domain+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
+                                else:
+                                    print(domain+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None\n")
+                            except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
+                                print(domain+","+statcode+" "+reasoncode+","+title+","+whoislkup+"\n")
             else:
-                if (":80" in newdom) or (":443" in newdom):
-                    redirurl,redirport=newdom.split(':')
-                    whoislkup=(socket.gethostbyname(redirurl))
-                    with warnings.catch_warnings():
-                        warnings.filterwarnings("ignore", category=UserWarning)
-                        try:
-                            obj = IPWhois(whoislkup)
-                            results = obj.lookup_whois()
-                            ASNNumber=results['asn']
-                            ASNDesc=results['asn_description']
-                            if ASNDesc is not None:
-                                print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
-                            else:
-                                print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
-                        except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                            print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+"\n")
-                else:
-                    whoislkup=(socket.gethostbyname(newdom))
-                    with warnings.catch_warnings():
-                        warnings.filterwarnings("ignore", category=UserWarning)
-                        try:
-                            obj = IPWhois(whoislkup)
-                            results = obj.lookup_whois()
-                            ASNNumber=results['asn']
-                            ASNDesc=results['asn_description']
-                            if ASNDesc is not None:
-                                print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
-                            else:
-							    print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
-                        except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                            print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+"\n")
+                statcode=str(r.status_code)
+                reasoncode=str(r.reason)
+                if ("40" not in statcode) and ("50" not in statcode):
+                    if (":80" in newdom) or (":443" in newdom):
+                        redirurl,redirport=newdom.split(':')
+                        whoislkup=(socket.gethostbyname(redirurl))
+                        with warnings.catch_warnings():
+                            warnings.filterwarnings("ignore", category=UserWarning)
+                            try:
+                                obj = IPWhois(whoislkup)
+                                results = obj.lookup_whois()
+                                ASNNumber=results['asn']
+                                ASNDesc=results['asn_description']
+                                if ASNDesc is not None:
+                                    print(domain+","+statcode+" "+reasoncode+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
+                                else:
+                                    print(domain+","+statcode+" "+reasoncode+","+" "+","+whoislkup+","+ASNNumber+",None\n")
+                            except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
+                                print(domain+","+statcode+" "+reasoncode+","+" "+","+whoislkup+"\n")
+                    else:
+                        whoislkup=(socket.gethostbyname(newdom))
+                        with warnings.catch_warnings():
+                            warnings.filterwarnings("ignore", category=UserWarning)
+                            try:
+                                obj = IPWhois(whoislkup)
+                                results = obj.lookup_whois()
+                                ASNNumber=results['asn']
+                                ASNDesc=results['asn_description']
+                                if ASNDesc is not None:
+                                    print(domain+","+statcode+" "+reasoncode+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
+                                else:
+                                    print(domain+","+statcode+" "+reasoncode+","+" "+","+whoislkup+","+ASNNumber+",None\n")
+                            except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
+                                print(domain+","+statcode+" "+reasoncode+","+" "+","+whoislkup+"\n")
     except (lxml.etree.ParserError, requests.exceptions.ReadTimeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError, requests.exceptions.SSLError) as error :
-            pass
-
+        pass
+		
 def subdomainoutputfile(filename,wordlist,o):
     with codecs.open(filename, encoding='utf-8') as f:
         for line in f:
@@ -559,7 +547,7 @@ def subdomainoutputfile(filename,wordlist,o):
                                             if ASNDesc is not None:
                                                 o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
                                             else:
-											    o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None\n")
+                                                o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None\n")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                             o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+"\n")
                                 else:
@@ -574,7 +562,7 @@ def subdomainoutputfile(filename,wordlist,o):
                                             if ASNDesc is not None:
                                                 o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
                                             else:
-											    o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None\n")
+                                                o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None\n")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                             o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+"\n")		
                             else:
@@ -591,7 +579,7 @@ def subdomainoutputfile(filename,wordlist,o):
                                             if ASNDesc is not None:
                                                 o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
                                             else:
-											    o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
+                                                o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                             o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+"\n")
                                 else:
@@ -606,7 +594,7 @@ def subdomainoutputfile(filename,wordlist,o):
                                             if ASNDesc is not None:
                                                 o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
                                             else:
-											    o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
+                                                o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                             o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+"\n")
                         else:
@@ -680,7 +668,7 @@ def subdomainoutputfile(filename,wordlist,o):
                                             if ASNDesc is not None:
                                                 o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
                                             else:
-											    o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
+                                                o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                             o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+"\n")
                     except (lxml.etree.ParserError, requests.exceptions.ReadTimeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError, requests.exceptions.SSLError) as error :
@@ -997,7 +985,7 @@ def singledomainoutputfile(domain,o):
                             if ASNDesc is not None:
                                 o.write(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
                             else:
-							    o.write(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
+                                o.write(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                             o.write(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+"\n")
     except (lxml.etree.ParserError, requests.exceptions.ReadTimeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError, requests.exceptions.SSLError) as error :
@@ -1035,11 +1023,11 @@ def singlesuboutput (domain,wordlist):
                                     ASNNumber=results['asn']
                                     ASNDesc=results['asn_description']
                                     if ASNDesc is not None:
-                                        print (sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                        print(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    print (sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                        print(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                    print (sub+",was redirected to,"+r.url+","+title+","+whoislkup)
+                                    print(sub+",was redirected to,"+r.url+","+title+","+whoislkup)
                         else:
                             whoislkup=(socket.gethostbyname(newdom))
                             with warnings.catch_warnings():
@@ -1050,11 +1038,11 @@ def singlesuboutput (domain,wordlist):
                                     ASNNumber=results['asn']
                                     ASNDesc=results['asn_description']
                                     if ASNDesc is not None:
-                                        print (sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                        print(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    print (sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                        print(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                    print (sub+",was redirected to,"+r.url+","+title+","+whoislkup)							
+                                    print(sub+",was redirected to,"+r.url+","+title+","+whoislkup)
                     else:
                         if (":80" in newdom) or (":443" in newdom):
                             redirurl,redirport=newdom.split(':')
@@ -1067,11 +1055,11 @@ def singlesuboutput (domain,wordlist):
                                     ASNNumber=results['asn']
                                     ASNDesc=results['asn_description']
                                     if ASNDesc is not None:
-                                        print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                        print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                        print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                    print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
                         else:
                             whoislkup=(socket.gethostbyname(newdom))
                             with warnings.catch_warnings():
@@ -1082,11 +1070,11 @@ def singlesuboutput (domain,wordlist):
                                     ASNNumber=results['asn']
                                     ASNDesc=results['asn_description']
                                     if ASNDesc is not None:
-                                        print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                        print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                        print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                    print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
                 else:
                     tree = fromstring(r.content)
                     title=(tree.findtext('.//title'))
@@ -1107,11 +1095,11 @@ def singlesuboutput (domain,wordlist):
                                         ASNNumber=results['asn']
                                         ASNDesc=results['asn_description']
                                         if ASNDesc is not None:
-                                            print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                            print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                         else:
-										    print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
+                                            print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
                                     except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                        print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
+                                        print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
                             else:
                                 whoislkup=(socket.gethostbyname(newdom))
                                 with warnings.catch_warnings():
@@ -1122,11 +1110,11 @@ def singlesuboutput (domain,wordlist):
                                         ASNNumber=results['asn']
                                         ASNDesc=results['asn_description']
                                         if ASNDesc is not None:
-                                            print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                            print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                         else:
-										    print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
+                                            print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
                                     except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                        print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
+                                        print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
                     else:
                         if (":80" in newdom) or (":443" in newdom):
                             redirurl,redirport=newdom.split(':')
@@ -1139,11 +1127,11 @@ def singlesuboutput (domain,wordlist):
                                     ASNNumber=results['asn']
                                     ASNDesc=results['asn_description']
                                     if ASNDesc is not None:
-                                        print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                        print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                        print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                    print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
                         else:
                             whoislkup=(socket.gethostbyname(newdom))
                             with warnings.catch_warnings():
@@ -1154,11 +1142,11 @@ def singlesuboutput (domain,wordlist):
                                     ASNNumber=results['asn']
                                     ASNDesc=results['asn_description']
                                     if ASNDesc is not None:
-                                        print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                        print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                        print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                    print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
             except (lxml.etree.ParserError, requests.exceptions.ReadTimeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError, requests.exceptions.SSLError) as error :
                 pass
 
@@ -1195,7 +1183,7 @@ def singlesuboutputfile (domain,wordlist,o):
                                     if ASNDesc is not None:
                                         o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                        o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                     o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup)
                         else:
@@ -1210,7 +1198,7 @@ def singlesuboutputfile (domain,wordlist,o):
                                     if ASNDesc is not None:
                                         o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                        o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                     o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup)							
                     else:
@@ -1227,7 +1215,7 @@ def singlesuboutputfile (domain,wordlist,o):
                                     if ASNDesc is not None:
                                         o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                        o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                     o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
                         else:
@@ -1242,7 +1230,7 @@ def singlesuboutputfile (domain,wordlist,o):
                                     if ASNDesc is not None:
                                         o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                        o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                     o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
                 else:
@@ -1267,7 +1255,7 @@ def singlesuboutputfile (domain,wordlist,o):
                                         if ASNDesc is not None:
                                             o.write(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                         else:
-										    o.write(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
+                                            o.write(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
                                     except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                         o.write(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
                             else:
@@ -1282,7 +1270,7 @@ def singlesuboutputfile (domain,wordlist,o):
                                         if ASNDesc is not None:
                                             o.write(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                         else:
-										    o.write(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
+                                            o.write(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
                                     except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                         o.write(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
                     else:
@@ -1299,7 +1287,7 @@ def singlesuboutputfile (domain,wordlist,o):
                                     if ASNDesc is not None:
                                         o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                        o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                     o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
                         else:
@@ -1314,7 +1302,7 @@ def singlesuboutputfile (domain,wordlist,o):
                                     if ASNDesc is not None:
                                         o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                        o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                     o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
             except (lxml.etree.ParserError, requests.exceptions.ReadTimeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError, requests.exceptions.SSLError) as error :
@@ -1356,11 +1344,11 @@ def subdomainp(filename,wordlist,proxy):
                                             ASNNumber=results['asn']
                                             ASNDesc=results['asn_description']
                                             if ASNDesc is not None:
-											    print (sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                                print(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                             else:
-											    print (sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                                print(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                            print (sub+",was redirected to,"+r.url+","+title+","+whoislkup)
+                                            print(sub+",was redirected to,"+r.url+","+title+","+whoislkup)
                                 else:
                                     whoislkup=(socket.gethostbyname(newdom))
                                     with warnings.catch_warnings():
@@ -1371,11 +1359,11 @@ def subdomainp(filename,wordlist,proxy):
                                             ASNNumber=results['asn']
                                             ASNDesc=results['asn_description']
                                             if ASNDesc is not None:
-                                                print (sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                                print(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                             else:
-											    print (sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                                print(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                            print (sub+",was redirected to,"+r.url+","+title+","+whoislkup)
+                                            print(sub+",was redirected to,"+r.url+","+title+","+whoislkup)
                             else:
                                 if (":80" in newdom) or (":443" in newdom):
                                     redirurl,redirport=newdom.split(':')
@@ -1388,11 +1376,11 @@ def subdomainp(filename,wordlist,proxy):
                                             ASNNumber=results['asn']
                                             ASNDesc=results['asn_description']
                                             if ASNDesc is not None:
-                                                print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                                print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                             else:
-											    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                                print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                            print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                            print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
                                 else:
                                     whoislkup=(socket.gethostbyname(newdom))
                                     with warnings.catch_warnings():
@@ -1403,11 +1391,11 @@ def subdomainp(filename,wordlist,proxy):
                                             ASNNumber=results['asn']
                                             ASNDesc=results['asn_description']
                                             if ASNDesc is not None:
-                                                print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                                print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                             else:
-									            print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                                print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                            print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                            print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
                         else:
                             tree = fromstring(r.content)
                             title=(tree.findtext('.//title'))
@@ -1428,11 +1416,11 @@ def subdomainp(filename,wordlist,proxy):
                                                 ASNNumber=results['asn']
                                                 ASNDesc=results['asn_description']
                                                 if ASNDesc is not None:
-                                                    print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                                    print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                                 else:
-												    print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
+                                                    print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
                                             except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                                print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
+                                                print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
                                     else:
                                         whoislkup=(socket.gethostbyname(newdom))
                                         with warnings.catch_warnings():
@@ -1443,11 +1431,11 @@ def subdomainp(filename,wordlist,proxy):
                                                 ASNNumber=results['asn']
                                                 ASNDesc=results['asn_description']
                                                 if ASNDesc is not None:
-                                                    print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                                    print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                                 else:
-												    print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                                    print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                             except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                                print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
+                                                print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
                             else:
                                 if (":80" in newdom) or (":443" in newdom):
                                     redirurl,redirport=newdom.split(':')
@@ -1460,11 +1448,11 @@ def subdomainp(filename,wordlist,proxy):
                                             ASNNumber=results['asn']
                                             ASNDesc=results['asn_description']
                                             if ASNDesc is not None:
-                                                print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                                print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                             else:
-											    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                                print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                            print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                            print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
                                 else:
                                     whoislkup=(socket.gethostbyname(newdom))
                                     with warnings.catch_warnings():
@@ -1475,11 +1463,11 @@ def subdomainp(filename,wordlist,proxy):
                                             ASNNumber=results['asn']
                                             ASNDesc=results['asn_description']
                                             if ASNDesc is not None:
-                                                print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                                print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                             else:
-											    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                                print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                            print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                            print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
                     except (lxml.etree.ParserError, requests.exceptions.ReadTimeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError, requests.exceptions.SSLError) as error :
                         pass
             w.close()
@@ -1516,11 +1504,11 @@ def domainfilep(filename,proxy):
                                 ASNNumber=results['asn']
                                 ASNDesc=results['asn_description']
                                 if ASNDesc is not None:
-                                    print (url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                    print(url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                 else:
-								    print (url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                    print(url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                             except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                print (url+",was redirected to,"+r.url+","+title+","+whoislkup)
+                                print(url+",was redirected to,"+r.url+","+title+","+whoislkup)
                     else:
                         whoislkup=(socket.gethostbyname(newdom))
                         with warnings.catch_warnings():
@@ -1531,11 +1519,11 @@ def domainfilep(filename,proxy):
                                 ASNNumber=results['asn']
                                 ASNDesc=results['asn_description']
                                 if ASNDesc is not None:
-                                    print (url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                    print(url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                 else:
-								    print (url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                    print(url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                             except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                print (url+",was redirected to,"+r.url+","+title+","+whoislkup)
+                                print(url+",was redirected to,"+r.url+","+title+","+whoislkup)
                 else:
                     if (":80" in newdom) or (":443" in newdom):
                         redirurl,redirport=newdom.split(':')
@@ -1548,11 +1536,11 @@ def domainfilep(filename,proxy):
                                 ASNNumber=results['asn']
                                 ASNDesc=results['asn_description']
                                 if ASNDesc is not None:
-                                    print (url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                    print(url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                 else:
-								    print (url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                    print(url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                             except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                print (url+",was redirected to,"+r.url+","+title+","+whoislkup)
+                                print(url+",was redirected to,"+r.url+","+title+","+whoislkup)
                     else:
                         whoislkup=(socket.gethostbyname(newdom))
                         with warnings.catch_warnings():
@@ -1563,11 +1551,11 @@ def domainfilep(filename,proxy):
                                 ASNNumber=results['asn']
                                 ASNDesc=results['asn_description']
                                 if ASNDesc is not None:
-                                    print (url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                    print(url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                 else:
-								    print (url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                    print(url+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                             except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                print (url+",was redirected to,"+r.url+","+title+","+whoislkup)
+                                print(url+",was redirected to,"+r.url+","+title+","+whoislkup)
             else:
                 tree = fromstring(r.content)
                 title=(tree.findtext('.//title'))
@@ -1588,11 +1576,11 @@ def domainfilep(filename,proxy):
                                     ASNNumber=results['asn']
                                     ASNDesc=results['asn_description']
                                     if ASNDesc is not None:
-                                        print (url+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                        print(url+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    print (url+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
+                                        print(url+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                    print (url+","+statcode+" "+reasoncode+","+title+","+whoislkup)
+                                    print(url+","+statcode+" "+reasoncode+","+title+","+whoislkup)
                         else:
                             whoislkup=(socket.gethostbyname(newdom))
                             with warnings.catch_warnings():
@@ -1603,11 +1591,11 @@ def domainfilep(filename,proxy):
                                     ASNNumber=results['asn']
                                     ASNDesc=results['asn_description']
                                     if ASNDesc is not None:
-                                        print (url+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                        print(url+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    print (url+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
+                                        print(url+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                    print (url+","+statcode+" "+reasoncode+","+title+","+whoislkup)
+                                    print(url+","+statcode+" "+reasoncode+","+title+","+whoislkup)
                 else:
                     if (":80" in newdom) or (":443" in newdom):
                         redirurl,redirport=newdom.split(':')
@@ -1620,11 +1608,11 @@ def domainfilep(filename,proxy):
                                 ASNNumber=results['asn']
                                 ASNDesc=results['asn_description']
                                 if ASNDesc is not None:
-                                    print (url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                    print(url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                 else:
-								    print (url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                    print(url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                             except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                print (url+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                print(url+",was redirected to,"+r.url+","+" "+","+whoislkup)
                     else:
                         whoislkup=(socket.gethostbyname(newdom))
                         with warnings.catch_warnings():
@@ -1635,11 +1623,11 @@ def domainfilep(filename,proxy):
                                 ASNNumber=results['asn']
                                 ASNDesc=results['asn_description']
                                 if ASNDesc is not None:
-                                    print (url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                    print(url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                 else:
-								    print (url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                    print(url+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                             except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                print (url+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                print(url+",was redirected to,"+r.url+","+" "+","+whoislkup)
         except (lxml.etree.ParserError, requests.exceptions.ReadTimeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError, requests.exceptions.SSLError) as error :
             pass
 
@@ -1672,12 +1660,11 @@ def singledomainp(domain,proxy):
                             ASNNumber=results['asn']
                             ASNDesc=results['asn_description']
                             if ASNDesc is not None:
-                                print (domain+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                print(domain+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                             else:
-                                print (domain+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
-                            
+                                print(domain+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                            print (domain+",was redirected to,"+r.url+","+title+","+whoislkup)
+                            print(domain+",was redirected to,"+r.url+","+title+","+whoislkup)
                 else:
                     whoislkup=(socket.gethostbyname(newdom))
                     with warnings.catch_warnings():
@@ -1688,11 +1675,11 @@ def singledomainp(domain,proxy):
                             ASNNumber=results['asn']
                             ASNDesc=results['asn_description']
                             if ASNDesc is not None:
-                                print (domain+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                print(domain+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                             else:
-                                print (domain+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                print(domain+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                            print (domain+",was redirected to,"+r.url+","+title+","+whoislkup)							
+                            print(domain+",was redirected to,"+r.url+","+title+","+whoislkup)			
             else:
                 if (":80" in newdom) or (":443" in newdom):
                     redirurl,redirport=newdom.split(':')
@@ -1705,11 +1692,11 @@ def singledomainp(domain,proxy):
                             ASNNumber=results['asn']
                             ASNDesc=results['asn_description']
                             if ASNDesc is not None:
-                                print (domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                             else:
-                                print (domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")                    
+                                print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")                 
                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                            print (domain+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                            print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup)
                 else:
                     whoislkup=(socket.gethostbyname(newdom))
                     with warnings.catch_warnings():
@@ -1720,11 +1707,11 @@ def singledomainp(domain,proxy):
                             ASNNumber=results['asn']
                             ASNDesc=results['asn_description']
                             if ASNDesc is not None:
-                                print (domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                             else:
-                                print (domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")                    
+                                print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")                 
                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                            print (domain+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                            print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup)
         else:
             tree = fromstring(r.content)
             title=(tree.findtext('.//title'))
@@ -1766,7 +1753,7 @@ def singledomainp(domain,proxy):
                             else:
                                 print(domain+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None\n")
                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                            print(domain+","+statcode+" "+reasoncode+","+title+","+whoislkup+"\n")				
+                            print(domain+","+statcode+" "+reasoncode+","+title+","+whoislkup+"\n")	
             else:
                 if (":80" in newdom) or (":443" in newdom):
                     redirurl,redirport=newdom.split(':')
@@ -1796,7 +1783,7 @@ def singledomainp(domain,proxy):
                             if ASNDesc is not None:
                                 print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
                             else:
-							    print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
+                                print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                             print(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+"\n")
     except (lxml.etree.ParserError, requests.exceptions.ReadTimeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError, requests.exceptions.SSLError) as error :
@@ -1840,7 +1827,7 @@ def subdomainoutputfilep(filename,wordlist,o,proxy):
                                             if ASNDesc is not None:
                                                 o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
                                             else:
-											    o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None\n")
+                                                o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None\n")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                             o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+"\n")
                                 else:
@@ -1855,7 +1842,7 @@ def subdomainoutputfilep(filename,wordlist,o,proxy):
                                             if ASNDesc is not None:
                                                 o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
                                             else:
-											    o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None\n")
+                                                o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None\n")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                             o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+"\n")		
                             else:
@@ -1872,7 +1859,7 @@ def subdomainoutputfilep(filename,wordlist,o,proxy):
                                             if ASNDesc is not None:
                                                 o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
                                             else:
-											    o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
+                                                o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                             o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+"\n")
                                 else:
@@ -1887,7 +1874,7 @@ def subdomainoutputfilep(filename,wordlist,o,proxy):
                                             if ASNDesc is not None:
                                                 o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
                                             else:
-											    o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
+                                                o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                             o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+"\n")
                         else:
@@ -1961,7 +1948,7 @@ def subdomainoutputfilep(filename,wordlist,o,proxy):
                                             if ASNDesc is not None:
                                                 o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
                                             else:
-											    o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
+                                                o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
                                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                             o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+"\n")
                     except (lxml.etree.ParserError, requests.exceptions.ReadTimeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError, requests.exceptions.SSLError) as error :
@@ -2281,7 +2268,7 @@ def singledomainoutputfilep(domain,o,proxy):
                             if ASNDesc is not None:
                                 o.write(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc+"\n")
                             else:
-							    o.write(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
+                                o.write(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None\n")
                         except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                             o.write(domain+",was redirected to,"+r.url+","+" "+","+whoislkup+"\n")
     except (lxml.etree.ParserError, requests.exceptions.ReadTimeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError, requests.exceptions.SSLError) as error :
@@ -2320,11 +2307,11 @@ def singlesuboutputp (domain,wordlist,proxy):
                                     ASNNumber=results['asn']
                                     ASNDesc=results['asn_description']
                                     if ASNDesc is not None:
-                                        print (sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                        print(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    print (sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                        print(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                    print (sub+",was redirected to,"+r.url+","+title+","+whoislkup)
+                                    print(sub+",was redirected to,"+r.url+","+title+","+whoislkup)
                         else:
                             whoislkup=(socket.gethostbyname(newdom))
                             with warnings.catch_warnings():
@@ -2335,11 +2322,11 @@ def singlesuboutputp (domain,wordlist,proxy):
                                     ASNNumber=results['asn']
                                     ASNDesc=results['asn_description']
                                     if ASNDesc is not None:
-                                        print (sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                        print(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    print (sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                        print(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                    print (sub+",was redirected to,"+r.url+","+title+","+whoislkup)							
+                                    print(sub+",was redirected to,"+r.url+","+title+","+whoislkup)				
                     else:
                         if (":80" in newdom) or (":443" in newdom):
                             redirurl,redirport=newdom.split(':')
@@ -2352,11 +2339,11 @@ def singlesuboutputp (domain,wordlist,proxy):
                                     ASNNumber=results['asn']
                                     ASNDesc=results['asn_description']
                                     if ASNDesc is not None:
-                                        print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                        print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                        print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                    print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
                         else:
                             whoislkup=(socket.gethostbyname(newdom))
                             with warnings.catch_warnings():
@@ -2367,11 +2354,11 @@ def singlesuboutputp (domain,wordlist,proxy):
                                     ASNNumber=results['asn']
                                     ASNDesc=results['asn_description']
                                     if ASNDesc is not None:
-                                        print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                        print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                        print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                    print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
                 else:
                     tree = fromstring(r.content)
                     title=(tree.findtext('.//title'))
@@ -2392,11 +2379,11 @@ def singlesuboutputp (domain,wordlist,proxy):
                                         ASNNumber=results['asn']
                                         ASNDesc=results['asn_description']
                                         if ASNDesc is not None:
-                                            print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                            print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                         else:
-										    print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
+                                            print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
                                     except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                        print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
+                                        print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
                             else:
                                 whoislkup=(socket.gethostbyname(newdom))
                                 with warnings.catch_warnings():
@@ -2407,11 +2394,11 @@ def singlesuboutputp (domain,wordlist,proxy):
                                         ASNNumber=results['asn']
                                         ASNDesc=results['asn_description']
                                         if ASNDesc is not None:
-                                            print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                            print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                         else:
-										    print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
+                                            print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
                                     except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                        print (sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
+                                        print(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
                     else:
                         if (":80" in newdom) or (":443" in newdom):
                             redirurl,redirport=newdom.split(':')
@@ -2424,11 +2411,11 @@ def singlesuboutputp (domain,wordlist,proxy):
                                     ASNNumber=results['asn']
                                     ASNDesc=results['asn_description']
                                     if ASNDesc is not None:
-                                        print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                        print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                        print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                    print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
                         else:
                             whoislkup=(socket.gethostbyname(newdom))
                             with warnings.catch_warnings():
@@ -2439,11 +2426,11 @@ def singlesuboutputp (domain,wordlist,proxy):
                                     ASNNumber=results['asn']
                                     ASNDesc=results['asn_description']
                                     if ASNDesc is not None:
-                                        print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
+                                        print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                        print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
-                                    print (sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
+                                    print(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
             except (lxml.etree.ParserError, requests.exceptions.ReadTimeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError, requests.exceptions.SSLError) as error :
                 pass
 
@@ -2482,7 +2469,7 @@ def singlesuboutputfilep (domain,wordlist,o,proxy):
                                     if ASNDesc is not None:
                                         o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                        o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                     o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup)
                         else:
@@ -2497,7 +2484,7 @@ def singlesuboutputfilep (domain,wordlist,o,proxy):
                                     if ASNDesc is not None:
                                         o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
+                                        o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                     o.write(sub+",was redirected to,"+r.url+","+title+","+whoislkup)							
                     else:
@@ -2514,7 +2501,7 @@ def singlesuboutputfilep (domain,wordlist,o,proxy):
                                     if ASNDesc is not None:
                                         o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                        o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                     o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
                         else:
@@ -2529,7 +2516,7 @@ def singlesuboutputfilep (domain,wordlist,o,proxy):
                                     if ASNDesc is not None:
                                         o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                        o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                     o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
                 else:
@@ -2554,7 +2541,7 @@ def singlesuboutputfilep (domain,wordlist,o,proxy):
                                         if ASNDesc is not None:
                                             o.write(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                         else:
-										    o.write(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
+                                            o.write(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
                                     except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                         o.write(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
                             else:
@@ -2569,7 +2556,7 @@ def singlesuboutputfilep (domain,wordlist,o,proxy):
                                         if ASNDesc is not None:
                                             o.write(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                         else:
-										    o.write(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
+                                            o.write(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup+","+ASNNumber+",None")
                                     except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                         o.write(sub+","+statcode+" "+reasoncode+","+title+","+whoislkup)
                     else:
@@ -2586,7 +2573,7 @@ def singlesuboutputfilep (domain,wordlist,o,proxy):
                                     if ASNDesc is not None:
                                         o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                        o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                     o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
                         else:
@@ -2601,7 +2588,7 @@ def singlesuboutputfilep (domain,wordlist,o,proxy):
                                     if ASNDesc is not None:
                                         o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+","+ASNDesc)
                                     else:
-									    o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
+                                        o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup+","+ASNNumber+",None")
                                 except (ipwhois.exceptions.WhoisLookupError,ipwhois.exceptions.IPDefinedError) as error:
                                     o.write(sub+",was redirected to,"+r.url+","+" "+","+whoislkup)
             except (lxml.etree.ParserError, requests.exceptions.ReadTimeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError, requests.exceptions.SSLError) as error :
@@ -2702,14 +2689,14 @@ def main(argv):
             print(args)
     except KeyboardInterrupt:
         print('Exiting...')
-    #except IOError:
-    #    print('Failed to open input file/domain ' + args.filename + ' for reading')
-    #    print('Exiting...!')
-    #    sys.exit(2)     
+    except IOError:
+        print('Failed to open input file/domain ' + args.filename + ' for reading')
+        print('Exiting...!')
+        sys.exit(2)     
         
 if __name__ == "__main__":
     try:
         argv = sys.argv
     except IndexError:
         sys.exit(2)
-    main(sys.argv[1:])              
+    main(sys.argv[1:])
